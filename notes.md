@@ -18,7 +18,7 @@
 ## SafeGraph API
 
 - [Places API Overview](https://docs.safegraph.com/reference#programmatically-call-the-places-api)
-- [Manage API Keys (SafeGraph0](https://shop.safegraph.com/api/?tab=keys)
+- [Manage API Keys (SafeGraph)](https://shop.safegraph.com/api/?tab=keys)
 
 ## References
 
