@@ -17,6 +17,7 @@
 
 ## SafeGraph API
 
+- [safegraphQL](https://pypi.org/project/safegraphQL/)
 - [Places API Overview](https://docs.safegraph.com/reference#programmatically-call-the-places-api)
 - [Manage API Keys (SafeGraph)](https://shop.safegraph.com/api/?tab=keys)
 
