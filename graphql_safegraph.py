@@ -82,7 +82,7 @@ client = Client(transport=transport, fetch_schema_from_transport=True)
 
 
 # %%
-results = client.execute(query2)
+results = client.execute(gql(query2))
 
 # %%
 # https://pypi.org/project/safegraphQL/
