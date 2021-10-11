@@ -6,46 +6,20 @@
 # import sys
 # !{sys.executable} -m pip install --pre gql
 # %%
+# https://docs.safegraph.com/reference#places-api-overview-new
 import os
 from dotenv import load_dotenv
 load_dotenv()
 sfkey = os.environ.get("SAFEGRAPH_KEY")
+
+
 # %%
-# https://pypi.org/project/safegraphQL/
-# https://github.com/echong-SG/API-python-client-MKilic
-import requests
-import json
 import pandas as pd
-import safegraphql.client as sgql
+import json
+
 
 # %%
-# https://gql.readthedocs.io/en/v3.0.0a6/
-# https://github.com/graphql-python/gql
-# Please note that this basic example won't work if you have an asyncio event loop running. In some python environments (as with Jupyter which uses IPython) an asyncio event loop is created for you. In that case you should use instead the async usage example.
-# 
-# import asyncio
-# https://gql.readthedocs.io/en/latest/async/async_usage.html#async-usage
-from gql import gql, Client
-from gql.transport.requests import RequestsHTTPTransport
-
-# %%
-
-# %%
-# Select your transport with a defined url endpoint
-transport = RequestsHTTPTransport(
-    url="https://api.safegraph.com/v1/graphql",
-    verify=True,
-    retries=3,
-    headers={'Content-Type': 'application/json', 'apikey': sfkey})
-
-# %%
-async with Client(transport=transport,  
-    fetch_schema_from_transport=True
-    ) as client:
-        result = await client.execute(query)
-# %%
-client = Client(transport=transport, fetch_schema_from_transport=True)
-# %%
+url = 'https://api.safegraph.com/v1/graphql'
 query = """
 query {
   lookup(placekey: "225-222@5vg-7gs-t9z"){
@@ -59,27 +33,61 @@ query {
 }
 """
 
-# %%
-results = client.execute(query)
-# %%
-url = 'https://api.safegraph.com/v1/graphql'
+query2 = """query {
+  lookup(placekey: "222-224@5vg-7gr-6kz") {
+    placekey
+    safegraph_core {
+      location_name
+      street_address
+      city
+      region
+      postal_code
+      iso_country_code
+    }
+  }
+}
+"""
 
+# %%
+# Using the requests package
+import requests
 r = requests.post(
     url,
     json={'query': query},
-    params = {'apikey':sfkey})
+    headers = {'Content-Type': 'application/json', 'apikey':sfkey})
 
 # %%
 print(r.status_code)
 print(r.text)
-# %%
 json_data = json.loads(r.text)
-# %%
-df_data = json_data['data']['characters']['results']
-df = pd.DataFrame(df_data)
-# %%
+df_data = json_data['data']['lookup']
+print(df_data)
 
 # %%
+
+# https://gql.readthedocs.io/en/v3.0.0a6/
+# https://github.com/graphql-python/gql
+from gql import gql, Client
+from gql.transport.requests import RequestsHTTPTransport
+
+# Select your transport with a defined url endpoint
+transport = RequestsHTTPTransport(
+    url=url,
+    verify=True,
+    retries=3,
+    headers={'Content-Type': 'application/json', 'apikey': sfkey})
+
+# %%
+client = Client(transport=transport, fetch_schema_from_transport=True)
+
+
+# %%
+results = client.execute(query2)
+
+# %%
+# https://pypi.org/project/safegraphQL/
+# https://github.com/echong-SG/API-python-client-MKilic
+import safegraphql.client as sgql
 sgql_client = sgql.HTTP_Client(apikey = sfkey)
 
 # %%
