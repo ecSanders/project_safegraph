@@ -18,6 +18,7 @@ Your proposal should be no more than two pages and should include the following;
 
 - Team member names and majors
 - Business needs you will address and why this need is of value
+- Explanation of the current SafeGraph data format and some descriptive visualizations
 - Additional data that you will leverage beyond that found in the SafeGraph API
 - Description of what constitutes a successfully implemented product
 
