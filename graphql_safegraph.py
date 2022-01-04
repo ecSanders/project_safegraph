@@ -7,19 +7,18 @@
 # !{sys.executable} -m pip install --pre gql
 # %%
 # https://docs.safegraph.com/reference#places-api-overview-new
-import os
-from dotenv import load_dotenv
-load_dotenv()
-sfkey = os.environ.get("SAFEGRAPH_KEY")
-
-
-# %%
+# https://stackoverflow.com/questions/56856005/how-to-set-environment-variable-in-databricks/56863551
 import pandas as pd
 import json
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+sfkey = os.environ.get("SAFEGRAPH_KEY")
 
 # %%
-url = 'https://api.safegraph.com/v1/graphql'
+url = 'https://api.safegraph.com/v2/graphql'
 query = """
 query {
   lookup(placekey: "225-222@5vg-7gs-t9z"){
@@ -34,15 +33,44 @@ query {
 """
 
 query2 = """query {
-  lookup(placekey: "222-224@5vg-7gr-6kz") {
-    placekey
-    safegraph_core {
-      location_name
-      street_address
-      city
-      region
-      postal_code
-      iso_country_code
+  search(filter: { 
+    naics_code: 813110,
+    address: {
+      region: "UT"
+    }
+  }){
+    places {
+      results(first: 500 after: "") {
+        pageInfo { hasNextPage, endCursor}
+        edges {
+          node {
+            safegraph_weekly_patterns (date: "2021-07-12") {
+              placekey
+              parent_placekey
+              location_name
+              street_address
+              city
+              region
+              postal_code
+              iso_country_code
+              date_range_start
+              date_range_end
+              raw_visit_counts
+              raw_visitor_counts
+              poi_cbg
+              visitor_home_cbgs
+              visitor_home_aggregation
+              visitor_daytime_cbgs
+              visitor_country_of_origin
+              distance_from_home
+              median_dwell
+              bucketed_dwell_times
+              related_same_day_brand
+              related_same_week_brand
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -64,6 +92,10 @@ df_data = json_data['data']['lookup']
 print(df_data)
 
 # %%
+pract = df_data.copy()
+
+pd.json_normalize(pract)
+# %%
 
 # https://gql.readthedocs.io/en/v3.0.0a6/
 # https://github.com/graphql-python/gql
@@ -77,12 +109,19 @@ transport = RequestsHTTPTransport(
     retries=3,
     headers={'Content-Type': 'application/json', 'apikey': sfkey})
 
-# %%
 client = Client(transport=transport, fetch_schema_from_transport=True)
 
 
 # %%
 results = client.execute(gql(query2))
+
+
+# %%
+edges = results['search']['places']['results']['edges']
+resultsNorm = [dat.pop('node') for dat in edges]
+resultsNorm = [dat.pop('safegraph_weekly_patterns') for dat in resultsNorm]
+
+dat = pd.json_normalize(resultsNorm)
 
 # %%
 # https://pypi.org/project/safegraphQL/
