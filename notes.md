@@ -8,6 +8,11 @@
 > 2. It was designed to be more efficient, performant, and provide a better developer experience for working with data in a client-server architecture
 > 3. GraphQL adoption has significantly grown since it was first open-sourced and it doesn’t look like it’s going anywhere soon.
 
+- [Demystifying GraphQL Connections](https://andrewingram.net/posts/demystifying-graphql-connections/)
+- [https://www.apollographql.com/blog/graphql/explaining-graphql-connections/](https://www.apollographql.com/blog/graphql/explaining-graphql-connections/)
+- [Introduction to GraphQL](https://graphql.org/learn/)
+- [Queries and Mutations](https://graphql.org/learn/queries/#variables)
+
 ## R & Python
 
 - [ghql R package](https://github.com/ropensci/ghql)
@@ -18,8 +23,11 @@
 ## SafeGraph API
 
 - [safegraphQL](https://pypi.org/project/safegraphQL/)
-- [Places API Overview](https://docs.safegraph.com/reference#programmatically-call-the-places-api)
+- [Places API Overview](https://docs.safegraph.com/reference/places-api-overview-new)
 - [Manage API Keys (SafeGraph)](https://shop.safegraph.com/api/?tab=keys)
+- [Programmatically Call the Places API](https://docs.safegraph.com/reference/programmatically-call-the-places-api)
+- [Search by Industry (NAICS)](https://docs.safegraph.com/reference/search-by-industry)
+- [GraphiQL Explorer](https://docs.safegraph.com/reference/graphiql-explorer-new)
 
 ## References
 
