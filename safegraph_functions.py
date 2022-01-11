@@ -22,9 +22,11 @@ def rangenumbers(x):
     else:
         return range(1, x.size + 1)
 
-def expand_json(var, dat):
+def expand_json(var, dat, wide=True):
 
     rowid = dat.placekey
+    start_date = dat.date_range_start
+    end_date = dat.date_range_end
 
     parsedat = dat[var]
     loadsdat = parsedat.apply(jsonloads)
@@ -39,13 +41,30 @@ def expand_json(var, dat):
     # rename the columns
     df_wide.columns = col_names_long # add variable name to column names
 
-    df_wide = df_wide.assign(placekey = rowid)
+    #id cols
+    id_cols = ["placekey", "startDate", "endDate"]
 
-    out = df_wide.loc[:, ["placekey"] + col_names_long]
+    df_wide = df_wide.assign(
+                placekey = rowid,
+                startDate = start_date,
+                endDate = end_date)
+
+    out = df_wide.loc[:, id_cols + col_names_long]
+
+    if not wide:
+        out = (out
+            .melt(id_vars = id_cols)
+            .assign(variable = lambda x: x.variable.str.replace(var + '-', ''))
+        )
 
     return out
 
 def expand_list(var, dat):
+
+    date_df = pd.DataFrame({
+        "startDate": dat.date_range_start, 
+        "endDate": dat.date_range_end,
+        "placekey": dat.placekey})
 
     dat_expand = (dat
         .assign(lvar = createlist(dat[var]))
@@ -56,18 +75,25 @@ def expand_list(var, dat):
     )
 
     dat_label = (dat_expand
-        .groupby('placekey')
+        .groupby('placekey', sort = False)
         .transform(lambda x: rangenumbers(x))
         .reset_index(drop=True)
     )
     
     if var.find("hour") !=-1:
-        dat_label.columns = ['hour']
+        orderName = 'hour'
     elif var.find("day") !=-1:
-        dat_label.columns = ['day']
+        orderName = 'day'
     else :
-        dat_label.columns = ['sequence']
-
-    out = pd.concat([dat_expand, dat_label], axis=1)
+        orderName = 'sequence'
+    
+    #dat_label.columns = ['sequence']
+    dat_label.rename(columns = {var:orderName}, inplace=True)
+    out = (pd.concat([dat_expand, dat_label], axis=1)
+        .merge(date_df, on = 'placekey')
+    )
     out[var] = out[var].astype(float)
+
+    out = out.filter(['placekey', 'startDate', 'endDate', orderName, var], axis=1)
+
     return out
