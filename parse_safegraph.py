@@ -1,10 +1,6 @@
 # %%
 import pandas as pd
 import numpy as np
-import pyarrow as pa
-import duckdb
-
-import pyarrow.parquet as pq
 
 import safegraph_functions as sgf
 
@@ -61,7 +57,8 @@ for i in json_cols:
 dat_pbd = sgf.expand_json('popularity_by_day', dat, wide=False)
 dat_rsdb = sgf.expand_json('related_same_day_brand', dat, wide=False)
 
-# dat_vhcbgs = sgf.expand_json('visitor_home_cbgs', dat, wide=True)
+
+dat_vhcbgs = sgf.expand_json('visitor_home_cbgs', dat.iloc[:100,:], wide=False)
 
 
 # %%

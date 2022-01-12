@@ -54,6 +54,7 @@ def expand_json(var, dat, wide=True):
     if not wide:
         out = (out
             .melt(id_vars = id_cols)
+            .dropna(axis=0, subset = ['value'])
             .assign(variable = lambda x: x.variable.str.replace(var + '-', ''))
         )
 
