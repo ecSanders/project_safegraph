@@ -92,6 +92,7 @@ def expand_list(var, dat):
     dat_label.rename(columns = {var:orderName}, inplace=True)
     out = (pd.concat([dat_expand, dat_label], axis=1)
         .merge(date_df, on = 'placekey')
+        .query("{0} != ''".format(var))
     )
     out[var] = out[var].astype(float)
 
