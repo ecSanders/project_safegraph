@@ -45,3 +45,22 @@ We will focus on the `gql` or `requests` examples for our work. I want to stay i
 #### [`parse_safegraph.py`](parse_safegraph.py)
 
 This file creates `.parquet` files for upload for our cloud compute.  In addition, it breaks all the nested data out into their own tables.
+
+## SafeGraph Guides
+
+You can see a [Colab notebook](https://colab.research.google.com/drive/1cs9qq_MWppKF4DQ0Xl3lyesHEnsc4D6D#scrollTo=_s0TsIZclcbe) that guides you through parsing data from shop.safegraph.com.
+
+SafeGraph has a a light technical quickstart guide to working with POI and Mobility data downloaded from the [SafeGraph Shop](https://shop.safegraph.com/), the self-serve source for hundreds of datasets about physical places. The goal of their guide is to get you working effectively with the SafeGraph data as fast as possible.
+
+They filmed a series of YouTube videos which provide context for each step:
+
+- [SafeGraph Shop Python Quickstart Part 1: Data Preparation](https://www.youtube.com/watch?v=e0X1EwBew_M)
+- [SafeGraph Shop Python Quickstart Part 2: Exploding Nested JSON Fields](https://www.youtube.com/watch?v=j3A_xX7Hwqo)
+- [SafeGraph Shop Python Quickstart Part 3: Joining to Census Data](https://www.youtube.com/watch?v=OQf9jCI_ltc)
+- [SafeGraph Shop Python Quickstart Part 4: Scaling](https://www.youtube.com/watch?v=BvDsHJNEkU0)
+
+They recommend joining the [SafeGraph Community Slack Channel](https://readme.safegraph.com/docs/join-our-community), a fantastic resource for live, in-person support. Finally, check out their [documentation](https://docs.safegraph.com/docs) for an exhaustive guide to our data.
+
+### Open Census Neighborhood Demographics Data
+
+- [Download Open Census Data & Neighborhood Demographics](https://www.safegraph.com/free-data/open-census-data)
