@@ -7,6 +7,8 @@ import re
 def jsonloads(x):
     if pd.isna(x):
         return None
+    if x == '':
+        return None
     else:
         return json.loads(x)
 
