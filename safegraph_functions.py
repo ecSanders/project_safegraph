@@ -49,7 +49,7 @@ def expand_json(var, dat):
                 .filter(['placekey', 'startDate',
                     'endDate', var, 'value'])
             )
-        temp_list.append(tempi)
+            temp_list.append(tempi)
     
     out = pd.concat(temp_list)
 
