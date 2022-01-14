@@ -58,21 +58,20 @@ def expand_json(var, dat):
 
 def expand_list(var, dat):
 
-    date_df = pd.DataFrame({
-        "startDate": dat.date_range_start, 
-        "endDate": dat.date_range_end,
-        "placekey": dat.placekey})
-
     dat_expand = (dat
         .assign(lvar = createlist(dat[var]))
-        .filter(["placekey", "lvar"])
+        .filter(["placekey", "date_range_start",
+            "date_range_end","lvar"])
         .explode("lvar")
-        .reset_index(drop=True)
         .rename(columns={"lvar":var})
+        .query("{0} != ''".format(var))
+        .reset_index(drop=True)
     )
 
     dat_label = (dat_expand
-        .groupby('placekey', sort = False)
+        .groupby(
+            ['placekey', 'date_range_start', 'date_range_end'],
+            sort = False)
         .transform(lambda x: rangenumbers(x))
         .reset_index(drop=True)
     )
@@ -86,12 +85,16 @@ def expand_list(var, dat):
     
     #dat_label.columns = ['sequence']
     dat_label.rename(columns = {var:orderName}, inplace=True)
-    out = (pd.concat([dat_expand, dat_label], axis=1)
-        .merge(date_df, on = 'placekey')
-        .query("{0} != ''".format(var))
-    )
+    if dat_label.shape[0] != dat_expand.shape[0]:
+        print("Concat not same size")
+        return None
+    out = pd.concat([dat_expand, dat_label], axis=1).reset_index(drop=True)
     out[var] = out[var].astype(float)
 
-    out = out.filter(['placekey', 'startDate', 'endDate', orderName, var], axis=1)
+    out = (out.rename(columns = {
+        'date_range_start':'startDate', 'date_range_end':'endDate'})
+        .filter(
+            ['placekey', 'startDate', 'endDate', orderName, var],axis=1)
+    )
 
     return out
