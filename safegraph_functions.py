@@ -64,6 +64,7 @@ def expand_list(var, dat):
             "date_range_end","lvar"])
         .explode("lvar")
         .rename(columns={"lvar":var})
+        .dropna(subset = ['date_range_start', 'date_range_end'])
         .query("{0} != ''".format(var))
         .reset_index(drop=True)
     )
