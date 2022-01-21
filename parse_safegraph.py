@@ -48,7 +48,7 @@ dat_vbd.to_parquet("parquet/visits_by_day.parquet")
 
 for i in json_cols:
     print(i)
-    dati = sgf.expand_json(i, dat, wide=False)
+    dati = sgf.expand_json(i, dat)
     dati.to_parquet("parquet/" + i + ".parquet")
  
     

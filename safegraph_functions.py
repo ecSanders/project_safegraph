@@ -7,6 +7,8 @@ import re
 def jsonloads(x):
     if pd.isna(x):
         return None
+    if x == '':
+        return None
     else:
         return json.loads(x)
 
@@ -22,7 +24,9 @@ def rangenumbers(x):
     else:
         return range(1, x.size + 1)
 
-def expand_json(var, dat, wide=True):
+
+# changed to only output long format and match the list output
+def expand_json(var, dat):
 
     rowid = dat.placekey
     start_date = dat.date_range_start
@@ -30,53 +34,45 @@ def expand_json(var, dat, wide=True):
 
     parsedat = dat[var]
     loadsdat = parsedat.apply(jsonloads)
-    df_wide = pd.json_normalize(loadsdat)
 
-    # clean up store names so they work as column names
-    col_names = df_wide.columns
-    col_names = [re.sub(r'[^\w\s]','', x) for x in col_names] # remove non-alphanumeric characters
-    col_names = [str(col).lower().replace(" ", "_") for col in col_names] # replace spaces with dashes
-    col_names_long = [var + '-' + col for col in col_names] 
+    temp_list = list()
+    for i in range(rowid.size):
+        if loadsdat[i] != None:
+            tempi = (pd.json_normalize(loadsdat[i])
+                .melt()
+                .rename(columns = {'variable':var})
+                .assign(
+                    placekey = rowid[i],
+                    startDate =  start_date[i],
+                    endDate = end_date[i]
+                )
+                .filter(['placekey', 'startDate',
+                    'endDate', var, 'value'])
+            )
+            temp_list.append(tempi)
     
-    # rename the columns
-    df_wide.columns = col_names_long # add variable name to column names
+    out = pd.concat(temp_list)
 
-    #id cols
-    id_cols = ["placekey", "startDate", "endDate"]
-
-    df_wide = df_wide.assign(
-                placekey = rowid,
-                startDate = start_date,
-                endDate = end_date)
-
-    out = df_wide.loc[:, id_cols + col_names_long]
-
-    if not wide:
-        out = (out
-            .melt(id_vars = id_cols)
-            .dropna(axis=0, subset = ['value'])
-            .assign(variable = lambda x: x.variable.str.replace(var + '-', ''))
-        )
-
-    return out
+    return out    
+    
 
 def expand_list(var, dat):
 
-    date_df = pd.DataFrame({
-        "startDate": dat.date_range_start, 
-        "endDate": dat.date_range_end,
-        "placekey": dat.placekey})
-
     dat_expand = (dat
         .assign(lvar = createlist(dat[var]))
-        .filter(["placekey", "lvar"])
+        .filter(["placekey", "date_range_start",
+            "date_range_end","lvar"])
         .explode("lvar")
-        .reset_index(drop=True)
         .rename(columns={"lvar":var})
+        .dropna(subset = ['date_range_start', 'date_range_end'])
+        .query("{0} != ''".format(var))
+        .reset_index(drop=True)
     )
 
     dat_label = (dat_expand
-        .groupby('placekey', sort = False)
+        .groupby(
+            ['placekey', 'date_range_start', 'date_range_end'],
+            sort = False)
         .transform(lambda x: rangenumbers(x))
         .reset_index(drop=True)
     )
@@ -90,11 +86,16 @@ def expand_list(var, dat):
     
     #dat_label.columns = ['sequence']
     dat_label.rename(columns = {var:orderName}, inplace=True)
-    out = (pd.concat([dat_expand, dat_label], axis=1)
-        .merge(date_df, on = 'placekey')
-    )
+    if dat_label.shape[0] != dat_expand.shape[0]:
+        print("Concat not same size")
+        return None
+    out = pd.concat([dat_expand, dat_label], axis=1).reset_index(drop=True)
     out[var] = out[var].astype(float)
 
-    out = out.filter(['placekey', 'startDate', 'endDate', orderName, var], axis=1)
+    out = (out.rename(columns = {
+        'date_range_start':'startDate', 'date_range_end':'endDate'})
+        .filter(
+            ['placekey', 'startDate', 'endDate', orderName, var],axis=1)
+    )
 
     return out
