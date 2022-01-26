@@ -18,3 +18,5 @@ load_dotenv()
 sfkey = os.environ.get("SAFEGRAPH_KEY")
 
 # %%
+sfkey
+# %%
